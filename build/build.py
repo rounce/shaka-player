@@ -521,6 +521,12 @@ def main(args):
   if not custom_build.build_library(name, rebuild, is_debug):
     return 1
 
+#  if not compile_demo(rebuild, is_debug):
+#    return 1
+
+#  if not compile_receiver(rebuild, is_debug):
+#    return 1
+
   return 0
 
 if __name__ == '__main__':
