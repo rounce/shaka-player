@@ -24,10 +24,11 @@ goog.provide('shaka.test.TestScheme');
  *
  * @param {string} uri
  * @param {shakaExtern.Request} request
+ * @param {function(ProgressEvent, shakaExtern.Request)} onProgress
  * @param {shaka.net.NetworkingEngine.RequestType=} requestType
  * @return {!shakaExtern.IAbortableOperation.<shakaExtern.Response>}
  */
-shaka.test.TestScheme = function(uri, request, requestType) {
+shaka.test.TestScheme = function(uri, request, onProgress, requestType) {
   let manifestParts = /^test:([^/]+)$/.exec(uri);
   if (manifestParts) {
     /** @type {shakaExtern.Response} */
