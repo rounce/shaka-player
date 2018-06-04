@@ -640,6 +640,7 @@ shakaExtern.AbrConfiguration;
  *   abrFactory: shakaExtern.AbrManager.Factory,
  *   abr: shakaExtern.AbrConfiguration,
  *   preferredAudioLanguage: string,
+ *   preferredTrack: number,
  *   preferredTextLanguage: string,
  *   restrictions: shakaExtern.Restrictions,
  *   playRangeStart: number,
