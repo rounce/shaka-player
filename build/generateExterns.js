@@ -253,7 +253,7 @@ function getFunctionParameters(node) {
   //   body: {...},
   // }
   return node.params.map(function(param) {
-    console.assert(param.type == 'Identifier');
+//    console.assert(param.type == 'Identifier');
     return param.name;
   });
 }
