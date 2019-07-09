@@ -1,0 +1,3 @@
+#python build/build.py +@complete -@text -lib/polyfill/fullscreen.js -lib/polyfill/videoplaybackquality.js -lib/polyfill/mediakeys.js -@offline -@cast --force
+python build/build.py +@krasview --force
+cp dist/shaka-player.compiled.js ../shaka-player.compiled.js

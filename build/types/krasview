@@ -1,0 +1,12 @@
+# The complete library, containing every available plugin.
+
++@networking
++@dash
++@offline
+
++../../lib/polyfill/mediasource.js
++../../lib/polyfill/indexed_db.js
+
+#+../../lib/cast/cast_proxy.js
+#+../../lib/cast/cast_sender.js
+#+../../lib/cast/cast_utils.js
