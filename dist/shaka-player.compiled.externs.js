@@ -1535,6 +1535,14 @@ shaka.Player.prototype.getTextLanguagesAndRoles = function() {};
  */
 shaka.Player.prototype.getAudioLanguages = function() {};
 /**
+ * @return {!Array.<string>}
+ */
+shaka.Player.prototype.getAudioTracks = function() {};
+/**
+ * @return {!Array.<string>}
+ */
+shaka.Player.prototype.getVideoTracks = function() {};
+/**
  * Return a list of text languages available for the current
  * Period.
  * @return {!Array.<string>}
