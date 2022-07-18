@@ -6,31 +6,31 @@
 /** @const */
 var shaka = {};
 /** @const */
-shaka.offline = {};
-/** @const */
 shaka.abr = {};
 /** @const */
-shaka.net = {};
+shaka.dash = {};
 /** @const */
 shaka.media = {};
 /** @const */
 shaka.media.ManifestParser = {};
 /** @const */
-shaka.text = {};
+shaka.net = {};
+/** @const */
+shaka.offline = {};
 /** @const */
 shaka.polyfill = {};
 /** @const */
-shaka.util = {};
-/** @const */
-shaka.util.Uint8ArrayUtils = {};
-/** @const */
-shaka.dash = {};
+shaka.text = {};
 /** @const */
 shaka.text.TextEngine = {};
 /** @const */
 shaka.text.TextEngine.prototype = {};
 /** @const */
+shaka.util = {};
+/** @const */
 shaka.util.StringUtils = {};
+/** @const */
+shaka.util.Uint8ArrayUtils = {};
 
 /**
  * Creates a new Error.
@@ -724,20 +724,6 @@ shaka.abr.SimpleAbrManager.prototype.setVariants = function(variants) {};
  */
 shaka.abr.SimpleAbrManager.prototype.configure = function(config) {};
 /**
- * Registers a manifest parser by file extension.
- * @param {string} extension The file extension of the manifest.
- * @param {shakaExtern.ManifestParser.Factory} parserFactory The factory
- *   used to create parser instances.
- */
-shaka.media.ManifestParser.registerParserByExtension = function(extension, parserFactory) {};
-/**
- * Registers a manifest parser by MIME type.
- * @param {string} mimeType The MIME type of the manifest.
- * @param {shakaExtern.ManifestParser.Factory} parserFactory The factory
- *   used to create parser instances.
- */
-shaka.media.ManifestParser.registerParserByMime = function(mimeType, parserFactory) {};
-/**
  * Creates an InitSegmentReference, which provides the location to an
  * initialization segment.
  * @param {function():!Array.<string>} uris
@@ -1023,6 +1009,266 @@ shaka.util.Mp4Parser.sampleDescription = function(box) {};
  * @return {!shaka.util.Mp4Parser.CallbackType}
  */
 shaka.util.Mp4Parser.allData = function(callback) {};
+/**
+ * Creates a SegmentIndex.
+ * @param {!Array.<!shaka.media.SegmentReference>} references The list of
+ *   SegmentReferences, which must be sorted first by their start times
+ *   (ascending) and second by their end times (ascending), and have
+ *   continuous, increasing positions.
+ * @constructor
+ * @struct
+ * @implements {shaka.util.IDestroyable}
+ */
+shaka.media.SegmentIndex = function(references) {};
+/**
+ * @override
+ */
+shaka.media.SegmentIndex.prototype.destroy = function() {};
+/**
+ * Finds the position of the segment for the given time, in seconds, relative
+ * to the start of a particular Period. Returns the position of the segment
+ * with the largest end time if more than one segment is known for the given
+ * time.
+ * @param {number} time
+ * @return {?number} The position of the segment, or null
+ *   if the position of the segment could not be determined.
+ */
+shaka.media.SegmentIndex.prototype.find = function(time) {};
+/**
+ * Gets the SegmentReference for the segment at the given position.
+ * @param {number} position The position of the segment.
+ * @return {shaka.media.SegmentReference} The SegmentReference, or null if
+ *   no such SegmentReference exists.
+ */
+shaka.media.SegmentIndex.prototype.get = function(position) {};
+/**
+ * Offset all segment references by a fixed amount.
+ * @param {number} offset The amount to add to each segment's start and end
+ *   times.
+ */
+shaka.media.SegmentIndex.prototype.offset = function(offset) {};
+/**
+ * Merges the given SegmentReferences.  Supports extending the original
+ * references only.  Will not replace old references or interleave new ones.
+ * @param {!Array.<!shaka.media.SegmentReference>} references The list of
+ *   SegmentReferences, which must be sorted first by their start times
+ *   (ascending) and second by their end times (ascending), and have
+ *   continuous, increasing positions.
+ */
+shaka.media.SegmentIndex.prototype.merge = function(references) {};
+/**
+ * Removes all SegmentReferences that end before the given time.
+ * @param {number} time The time in seconds.
+ */
+shaka.media.SegmentIndex.prototype.evict = function(time) {};
+/**
+ * Registers a manifest parser by file extension.
+ * @param {string} extension The file extension of the manifest.
+ * @param {shakaExtern.ManifestParser.Factory} parserFactory The factory
+ *   used to create parser instances.
+ */
+shaka.media.ManifestParser.registerParserByExtension = function(extension, parserFactory) {};
+/**
+ * Registers a manifest parser by MIME type.
+ * @param {string} mimeType The MIME type of the manifest.
+ * @param {shakaExtern.ManifestParser.Factory} parserFactory The factory
+ *   used to create parser instances.
+ */
+shaka.media.ManifestParser.registerParserByMime = function(mimeType, parserFactory) {};
+/**
+ * Creates a PresentationTimeline.
+ * @param {?number} presentationStartTime The wall-clock time, in seconds,
+ *   when the presentation started or will start. Only required for live.
+ * @param {number} presentationDelay The delay to give the presentation, in
+ *   seconds.  Only required for live.
+ * @see {shakaExtern.Manifest}
+ * @see {@tutorial architecture}
+ * @constructor
+ * @struct
+ */
+shaka.media.PresentationTimeline = function(presentationStartTime, presentationDelay) {};
+/**
+ * @return {number} The presentation's duration in seconds.
+ *   Infinity indicates that the presentation continues indefinitely.
+ */
+shaka.media.PresentationTimeline.prototype.getDuration = function() {};
+/**
+ * Sets the presentation's duration.
+ * @param {number} duration The presentation's duration in seconds.
+ *   Infinity indicates that the presentation continues indefinitely.
+ */
+shaka.media.PresentationTimeline.prototype.setDuration = function(duration) {};
+/**
+ * @return {?number} The presentation's start time in seconds.
+ */
+shaka.media.PresentationTimeline.prototype.getPresentationStartTime = function() {};
+/**
+ * Sets the clock offset, which is the the difference between the client's clock
+ * and the server's clock, in milliseconds (i.e., serverTime = Date.now() +
+ * clockOffset).
+ * @param {number} offset The clock offset, in ms.
+ */
+shaka.media.PresentationTimeline.prototype.setClockOffset = function(offset) {};
+/**
+ * Sets the presentation's static flag.
+ * @param {boolean} isStatic If true, the presentation is static, meaning all
+ *   segments are available at once.
+ */
+shaka.media.PresentationTimeline.prototype.setStatic = function(isStatic) {};
+/**
+ * Sets the presentation's segment availability duration. The segment
+ * availability duration should only be set for live.
+ * @param {number} segmentAvailabilityDuration The presentation's new segment
+ *   availability duration in seconds.
+ */
+shaka.media.PresentationTimeline.prototype.setSegmentAvailabilityDuration = function(segmentAvailabilityDuration) {};
+/**
+ * Sets the presentation delay.
+ * @param {number} delay
+ */
+shaka.media.PresentationTimeline.prototype.setDelay = function(delay) {};
+/**
+ * Gives PresentationTimeline a Stream's segments so it can size and position
+ * the segment availability window, and account for missing segment
+ * information. This function should be called once for each Stream (no more,
+ * no less).
+ * @param {!Array.<!shaka.media.SegmentReference>} references
+ * @param {boolean} isFirstPeriod
+ */
+shaka.media.PresentationTimeline.prototype.notifySegments = function(references, isFirstPeriod) {};
+/**
+ * Gives PresentationTimeline a Stream's maximum segment duration so it can
+ * size and position the segment availability window. This function should be
+ * called once for each Stream (no more, no less), but does not have to be
+ * called if notifySegments() is called instead for a particular stream.
+ * @param {number} maxSegmentDuration The maximum segment duration for a
+ *   particular stream.
+ */
+shaka.media.PresentationTimeline.prototype.notifyMaxSegmentDuration = function(maxSegmentDuration) {};
+/**
+ * @return {boolean} True if the presentation is live; otherwise, return
+ *   false.
+ */
+shaka.media.PresentationTimeline.prototype.isLive = function() {};
+/**
+ * @return {boolean} True if the presentation is in progress (meaning not live,
+ *   but also not completely available); otherwise, return false.
+ */
+shaka.media.PresentationTimeline.prototype.isInProgress = function() {};
+/**
+ * Gets the presentation's current segment availability start time. Segments
+ * ending at or before this time should be assumed to be unavailable.
+ * @return {number} The current segment availability start time, in seconds,
+ *   relative to the start of the presentation.
+ */
+shaka.media.PresentationTimeline.prototype.getSegmentAvailabilityStart = function() {};
+/**
+ * Sets the presentation's current segment availability start time.
+ * @param {number} time
+ */
+shaka.media.PresentationTimeline.prototype.setAvailabilityStart = function(time) {};
+/**
+ * Gets the presentation's current segment availability end time. Segments
+ * starting after this time should be assumed to be unavailable.
+ * @return {number} The current segment availability end time, in seconds,
+ *   relative to the start of the presentation. Always returns the
+ *   presentation's duration for video-on-demand.
+ */
+shaka.media.PresentationTimeline.prototype.getSegmentAvailabilityEnd = function() {};
+/**
+ * Gets the seek range start time, offset by the given amount.  This is used to
+ * ensure that we don't "fall" back out of the seek window while we are
+ * buffering.
+ * @param {number} offset The offset to add to the start time.
+ * @return {number} The current seek start time, in seconds, relative to the
+ *   start of the presentation.
+ */
+shaka.media.PresentationTimeline.prototype.getSafeSeekRangeStart = function(offset) {};
+/**
+ * Gets the seek range start time.
+ * @return {number}
+ */
+shaka.media.PresentationTimeline.prototype.getSeekRangeStart = function() {};
+/**
+ * Gets the seek range end.
+ * @return {number}
+ */
+shaka.media.PresentationTimeline.prototype.getSeekRangeEnd = function() {};
+/**
+ * Creates a new DASH parser.
+ * @struct
+ * @constructor
+ * @implements {shakaExtern.ManifestParser}
+ */
+shaka.dash.DashParser = function() {};
+/**
+ * @override
+ */
+shaka.dash.DashParser.prototype.configure = function(config) {};
+/**
+ * @override
+ */
+shaka.dash.DashParser.prototype.start = function(uri, playerInterface) {};
+/**
+ * @override
+ */
+shaka.dash.DashParser.prototype.stop = function() {};
+/**
+ * @override
+ */
+shaka.dash.DashParser.prototype.update = function() {};
+/**
+ * @override
+ */
+shaka.dash.DashParser.prototype.onExpirationUpdated = function(sessionId, expiration) {};
+/**
+ * @namespace
+ * @summary A networking plugin to handle data URIs.
+ * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/data_URIs
+ * @param {string} uri
+ * @param {shakaExtern.Request} request
+ * @param {function(ProgressEvent, shakaExtern.Request)} onProgress
+ * @param {shaka.net.NetworkingEngine.RequestType=} requestType
+ * @return {!shakaExtern.IAbortableOperation.<shakaExtern.Response>}
+ */
+shaka.net.DataUriPlugin = function(uri, request, onProgress, requestType) {};
+/**
+ * @namespace
+ * @summary A networking plugin to handle http and https URIs via the Fetch API.
+ * @param {string} uri
+ * @param {shakaExtern.Request} request
+ * @param {function(ProgressEvent, shakaExtern.Request)} onProgress
+ * @param {shaka.net.NetworkingEngine.RequestType} requestType
+ * @return {!shakaExtern.IAbortableOperation.<shakaExtern.Response>}
+ */
+shaka.net.HttpFetchPlugin = function(uri, request, onProgress, requestType) {};
+/**
+ * Determine if Fetch API is supported in the browser. Note: this is
+ * deliberately exposed as a method to allow the client app to use the same
+ * logic as Shaka when determining support.
+ * @return {boolean}
+ */
+shaka.net.HttpFetchPlugin.isSupported = function() {};
+/**
+ * @namespace
+ * @summary A networking plugin to handle http and https URIs via XHR.
+ * @param {string} uri
+ * @param {shakaExtern.Request} request
+ * @param {function(ProgressEvent, shakaExtern.Request)} onProgress
+ * @param {shaka.net.NetworkingEngine.RequestType} requestType
+ * @return {!shakaExtern.IAbortableOperation.<shakaExtern.Response>}
+ */
+shaka.net.HttpXHRPlugin = function(uri, request, onProgress, requestType) {};
+/**
+ * @namespace
+ * @summary A plugin that handles requests for offline content.
+ * @param {string} uri
+ * @param {shakaExtern.Request} request
+ * @param {function(ProgressEvent, shakaExtern.Request)} onProgress
+ * @param {shaka.net.NetworkingEngine.RequestType=} requestType
+ * @return {!shakaExtern.IAbortableOperation.<shakaExtern.Response>}
+ */
+shaka.offline.OfflineScheme = function(uri, request, onProgress, requestType) {};
 /**
  * <p>
  * This defines the default text displayer plugin. An instance of this
@@ -1367,177 +1613,6 @@ shaka.Player.prototype.retryStreaming = function() {};
  */
 shaka.Player.prototype.getManifest = function() {};
 /**
- * Creates a PresentationTimeline.
- * @param {?number} presentationStartTime The wall-clock time, in seconds,
- *   when the presentation started or will start. Only required for live.
- * @param {number} presentationDelay The delay to give the presentation, in
- *   seconds.  Only required for live.
- * @see {shakaExtern.Manifest}
- * @see {@tutorial architecture}
- * @constructor
- * @struct
- */
-shaka.media.PresentationTimeline = function(presentationStartTime, presentationDelay) {};
-/**
- * @return {number} The presentation's duration in seconds.
- *   Infinity indicates that the presentation continues indefinitely.
- */
-shaka.media.PresentationTimeline.prototype.getDuration = function() {};
-/**
- * Sets the presentation's duration.
- * @param {number} duration The presentation's duration in seconds.
- *   Infinity indicates that the presentation continues indefinitely.
- */
-shaka.media.PresentationTimeline.prototype.setDuration = function(duration) {};
-/**
- * @return {?number} The presentation's start time in seconds.
- */
-shaka.media.PresentationTimeline.prototype.getPresentationStartTime = function() {};
-/**
- * Sets the clock offset, which is the the difference between the client's clock
- * and the server's clock, in milliseconds (i.e., serverTime = Date.now() +
- * clockOffset).
- * @param {number} offset The clock offset, in ms.
- */
-shaka.media.PresentationTimeline.prototype.setClockOffset = function(offset) {};
-/**
- * Sets the presentation's static flag.
- * @param {boolean} isStatic If true, the presentation is static, meaning all
- *   segments are available at once.
- */
-shaka.media.PresentationTimeline.prototype.setStatic = function(isStatic) {};
-/**
- * Sets the presentation's segment availability duration. The segment
- * availability duration should only be set for live.
- * @param {number} segmentAvailabilityDuration The presentation's new segment
- *   availability duration in seconds.
- */
-shaka.media.PresentationTimeline.prototype.setSegmentAvailabilityDuration = function(segmentAvailabilityDuration) {};
-/**
- * Sets the presentation delay.
- * @param {number} delay
- */
-shaka.media.PresentationTimeline.prototype.setDelay = function(delay) {};
-/**
- * Gives PresentationTimeline a Stream's segments so it can size and position
- * the segment availability window, and account for missing segment
- * information. This function should be called once for each Stream (no more,
- * no less).
- * @param {!Array.<!shaka.media.SegmentReference>} references
- * @param {boolean} isFirstPeriod
- */
-shaka.media.PresentationTimeline.prototype.notifySegments = function(references, isFirstPeriod) {};
-/**
- * Gives PresentationTimeline a Stream's maximum segment duration so it can
- * size and position the segment availability window. This function should be
- * called once for each Stream (no more, no less), but does not have to be
- * called if notifySegments() is called instead for a particular stream.
- * @param {number} maxSegmentDuration The maximum segment duration for a
- *   particular stream.
- */
-shaka.media.PresentationTimeline.prototype.notifyMaxSegmentDuration = function(maxSegmentDuration) {};
-/**
- * @return {boolean} True if the presentation is live; otherwise, return
- *   false.
- */
-shaka.media.PresentationTimeline.prototype.isLive = function() {};
-/**
- * @return {boolean} True if the presentation is in progress (meaning not live,
- *   but also not completely available); otherwise, return false.
- */
-shaka.media.PresentationTimeline.prototype.isInProgress = function() {};
-/**
- * Gets the presentation's current segment availability start time. Segments
- * ending at or before this time should be assumed to be unavailable.
- * @return {number} The current segment availability start time, in seconds,
- *   relative to the start of the presentation.
- */
-shaka.media.PresentationTimeline.prototype.getSegmentAvailabilityStart = function() {};
-/**
- * Sets the presentation's current segment availability start time.
- * @param {number} time
- */
-shaka.media.PresentationTimeline.prototype.setAvailabilityStart = function(time) {};
-/**
- * Gets the presentation's current segment availability end time. Segments
- * starting after this time should be assumed to be unavailable.
- * @return {number} The current segment availability end time, in seconds,
- *   relative to the start of the presentation. Always returns the
- *   presentation's duration for video-on-demand.
- */
-shaka.media.PresentationTimeline.prototype.getSegmentAvailabilityEnd = function() {};
-/**
- * Gets the seek range start time, offset by the given amount.  This is used to
- * ensure that we don't "fall" back out of the seek window while we are
- * buffering.
- * @param {number} offset The offset to add to the start time.
- * @return {number} The current seek start time, in seconds, relative to the
- *   start of the presentation.
- */
-shaka.media.PresentationTimeline.prototype.getSafeSeekRangeStart = function(offset) {};
-/**
- * Gets the seek range start time.
- * @return {number}
- */
-shaka.media.PresentationTimeline.prototype.getSeekRangeStart = function() {};
-/**
- * Gets the seek range end.
- * @return {number}
- */
-shaka.media.PresentationTimeline.prototype.getSeekRangeEnd = function() {};
-/**
- * Creates a SegmentIndex.
- * @param {!Array.<!shaka.media.SegmentReference>} references The list of
- *   SegmentReferences, which must be sorted first by their start times
- *   (ascending) and second by their end times (ascending), and have
- *   continuous, increasing positions.
- * @constructor
- * @struct
- * @implements {shaka.util.IDestroyable}
- */
-shaka.media.SegmentIndex = function(references) {};
-/**
- * @override
- */
-shaka.media.SegmentIndex.prototype.destroy = function() {};
-/**
- * Finds the position of the segment for the given time, in seconds, relative
- * to the start of a particular Period. Returns the position of the segment
- * with the largest end time if more than one segment is known for the given
- * time.
- * @param {number} time
- * @return {?number} The position of the segment, or null
- *   if the position of the segment could not be determined.
- */
-shaka.media.SegmentIndex.prototype.find = function(time) {};
-/**
- * Gets the SegmentReference for the segment at the given position.
- * @param {number} position The position of the segment.
- * @return {shaka.media.SegmentReference} The SegmentReference, or null if
- *   no such SegmentReference exists.
- */
-shaka.media.SegmentIndex.prototype.get = function(position) {};
-/**
- * Offset all segment references by a fixed amount.
- * @param {number} offset The amount to add to each segment's start and end
- *   times.
- */
-shaka.media.SegmentIndex.prototype.offset = function(offset) {};
-/**
- * Merges the given SegmentReferences.  Supports extending the original
- * references only.  Will not replace old references or interleave new ones.
- * @param {!Array.<!shaka.media.SegmentReference>} references The list of
- *   SegmentReferences, which must be sorted first by their start times
- *   (ascending) and second by their end times (ascending), and have
- *   continuous, increasing positions.
- */
-shaka.media.SegmentIndex.prototype.merge = function(references) {};
-/**
- * Removes all SegmentReferences that end before the given time.
- * @param {number} time The time in seconds.
- */
-shaka.media.SegmentIndex.prototype.evict = function(time) {};
-/**
  * This manages persistent offline data including storage, listing, and deleting
  * stored manifests.  Playback of offline manifests are done using Player
  * using the special URI (see shaka.offline.OfflineUri).
@@ -1614,27 +1689,6 @@ shaka.offline.Storage.prototype.list = function() {};
  */
 shaka.offline.Storage.deleteAll = function() {};
 /**
- * @namespace
- * @summary A networking plugin to handle data URIs.
- * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/data_URIs
- * @param {string} uri
- * @param {shakaExtern.Request} request
- * @param {function(ProgressEvent, shakaExtern.Request)} onProgress
- * @param {shaka.net.NetworkingEngine.RequestType=} requestType
- * @return {!shakaExtern.IAbortableOperation.<shakaExtern.Response>}
- */
-shaka.net.DataUriPlugin = function(uri, request, onProgress, requestType) {};
-/**
- * @namespace
- * @summary A networking plugin to handle http and https URIs via XHR.
- * @param {string} uri
- * @param {shakaExtern.Request} request
- * @param {function(ProgressEvent, shakaExtern.Request)} onProgress
- * @param {shaka.net.NetworkingEngine.RequestType} requestType
- * @return {!shakaExtern.IAbortableOperation.<shakaExtern.Response>}
- */
-shaka.net.HttpXHRPlugin = function(uri, request, onProgress, requestType) {};
-/**
  * Install all polyfills.
  */
 shaka.polyfill.installAll = function() {};
@@ -1645,57 +1699,3 @@ shaka.polyfill.installAll = function() {};
  *   will be executed before lower priority ones.  Default is 0.
  */
 shaka.polyfill.register = function(polyfill, priority) {};
-/**
- * @namespace
- * @summary A networking plugin to handle http and https URIs via the Fetch API.
- * @param {string} uri
- * @param {shakaExtern.Request} request
- * @param {function(ProgressEvent, shakaExtern.Request)} onProgress
- * @param {shaka.net.NetworkingEngine.RequestType} requestType
- * @return {!shakaExtern.IAbortableOperation.<shakaExtern.Response>}
- */
-shaka.net.HttpFetchPlugin = function(uri, request, onProgress, requestType) {};
-/**
- * Determine if Fetch API is supported in the browser. Note: this is
- * deliberately exposed as a method to allow the client app to use the same
- * logic as Shaka when determining support.
- * @return {boolean}
- */
-shaka.net.HttpFetchPlugin.isSupported = function() {};
-/**
- * Creates a new DASH parser.
- * @struct
- * @constructor
- * @implements {shakaExtern.ManifestParser}
- */
-shaka.dash.DashParser = function() {};
-/**
- * @override
- */
-shaka.dash.DashParser.prototype.configure = function(config) {};
-/**
- * @override
- */
-shaka.dash.DashParser.prototype.start = function(uri, playerInterface) {};
-/**
- * @override
- */
-shaka.dash.DashParser.prototype.stop = function() {};
-/**
- * @override
- */
-shaka.dash.DashParser.prototype.update = function() {};
-/**
- * @override
- */
-shaka.dash.DashParser.prototype.onExpirationUpdated = function(sessionId, expiration) {};
-/**
- * @namespace
- * @summary A plugin that handles requests for offline content.
- * @param {string} uri
- * @param {shakaExtern.Request} request
- * @param {function(ProgressEvent, shakaExtern.Request)} onProgress
- * @param {shaka.net.NetworkingEngine.RequestType=} requestType
- * @return {!shakaExtern.IAbortableOperation.<shakaExtern.Response>}
- */
-shaka.offline.OfflineScheme = function(uri, request, onProgress, requestType) {};
