@@ -6,44 +6,32 @@
 /** @const */
 var shaka = {};
 /** @const */
-shaka.text = {};
-/** @const */
-shaka.text.TextEngine = {};
-/** @const */
-shaka.text.TextEngine.prototype = {};
-/** @const */
-shaka.net = {};
-/** @const */
-shaka.util = {};
-/** @const */
 shaka.offline = {};
 /** @const */
-shaka.util.StringUtils = {};
+shaka.abr = {};
+/** @const */
+shaka.net = {};
 /** @const */
 shaka.media = {};
 /** @const */
 shaka.media.ManifestParser = {};
 /** @const */
-shaka.abr = {};
+shaka.text = {};
 /** @const */
-shaka.dash = {};
+shaka.polyfill = {};
+/** @const */
+shaka.util = {};
 /** @const */
 shaka.util.Uint8ArrayUtils = {};
 /** @const */
-shaka.polyfill = {};
+shaka.dash = {};
+/** @const */
+shaka.text.TextEngine = {};
+/** @const */
+shaka.text.TextEngine.prototype = {};
+/** @const */
+shaka.util.StringUtils = {};
 
-/**
- * An interface to standardize how objects are destroyed.
- * @interface
- */
-shaka.util.IDestroyable = function() {};
-/**
- * Destroys the object, releasing all resources and shutting down all
- * operations.  Returns a Promise which is resolved when destruction is
- * complete.  This Promise should never be rejected.
- * @return {!Promise}
- */
-shaka.util.IDestroyable.prototype.destroy = function() {};
 /**
  * Creates a new Error.
  * @param {shaka.util.Error.Severity} severity
@@ -202,24 +190,6 @@ shaka.util.Error.Code = {
   'NEW_KEY_OPERATION_NOT_SUPPORTED': 9011
 };
 /**
- * @param {string} mimeType
- * @param {!shakaExtern.TextParserPlugin} plugin
- */
-shaka.text.TextEngine.registerParser = function(mimeType, plugin) {};
-/**
- * @param {string} mimeType
- */
-shaka.text.TextEngine.unregisterParser = function(mimeType) {};
-/**
- * @param {shakaExtern.TextDisplayer} displayer
- */
-shaka.text.TextEngine.prototype.setDisplayer = function(displayer) {};
-/**
- * Append cues to text displayer.
- * @param {!Array<!shaka.text.Cue>} cues
- */
-shaka.text.TextEngine.prototype.appendCues = function(cues) {};
-/**
  * A work-alike for EventTarget.  Only DOM elements may be true EventTargets,
  * but this can be used as a base class to provide event dispatch to non-DOM
  * classes.  Only FakeEvents should be dispatched.
@@ -258,6 +228,18 @@ shaka.util.FakeEventTarget.prototype.removeEventListener = function(type, listen
  * @override
  */
 shaka.util.FakeEventTarget.prototype.dispatchEvent = function(event) {};
+/**
+ * An interface to standardize how objects are destroyed.
+ * @interface
+ */
+shaka.util.IDestroyable = function() {};
+/**
+ * Destroys the object, releasing all resources and shutting down all
+ * operations.  Returns a Promise which is resolved when destruction is
+ * complete.  This Promise should never be rejected.
+ * @return {!Promise}
+ */
+shaka.util.IDestroyable.prototype.destroy = function() {};
 /**
  * NetworkingEngine wraps all networking operations.  This accepts plugins that
  * handle the actual request.  A plugin is registered using registerScheme.
@@ -381,344 +363,6 @@ shaka.util.StringUtils.fromBytesAutoDetect = function(data) {};
  * @return {!ArrayBuffer}
  */
 shaka.util.StringUtils.toUTF8 = function(str) {};
-/**
- * Creates an InitSegmentReference, which provides the location to an
- * initialization segment.
- * @param {function():!Array.<string>} uris
- *   A function that creates the URIs of the resource containing the segment.
- * @param {number} startByte The offset from the start of the resource to the
- *   start of the segment.
- * @param {?number} endByte The offset from the start of the resource to the
- *   end of the segment, inclusive. null indicates that the segment extends
- *   to the end of the resource.
- * @constructor
- * @struct
- */
-shaka.media.InitSegmentReference = function(uris, startByte, endByte) {};
-/**
- * Creates the URIs of the resource containing the segment.
- * @return {!Array.<string>}
- */
-shaka.media.InitSegmentReference.prototype.createUris = function() {};
-/**
- * Returns the offset from the start of the resource to the
- * start of the segment.
- * @return {number}
- */
-shaka.media.InitSegmentReference.prototype.getStartByte = function() {};
-/**
- * Returns the offset from the start of the resource to the
- * end of the segment, inclusive. null indicates that the segment extends
- * to the end of the resource.
- * @return {?number}
- */
-shaka.media.InitSegmentReference.prototype.getEndByte = function() {};
-/**
- * Creates a SegmentReference, which provides the start time, end time, and
- * location to a media segment.
- * @param {number} position The segment's position within a particular Period.
- *   The following should hold true between any two SegmentReferences from the
- *   same Period, r1 and r2:
- *   IF r2.position > r1.position THEN
- *     [ (r2.startTime > r1.startTime) OR
- *       (r2.startTime == r1.startTime AND r2.endTime >= r1.endTime) ]
- * @param {number} startTime The segment's start time in seconds, relative to
- *   the start of a particular Period.
- * @param {number} endTime The segment's end time in seconds, relative to
- *   the start of a particular Period. The segment ends the instant before
- *   this time, so |endTime| must be strictly greater than |startTime|.
- * @param {function():!Array.<string>} uris
- *   A function that creates the URIs of the resource containing the segment.
- * @param {number} startByte The offset from the start of the resource to the
- *   start of the segment.
- * @param {?number} endByte The offset from the start of the resource to the
- *   end of the segment, inclusive. null indicates that the segment extends
- *   to the end of the resource.
- * @constructor
- * @struct
- */
-shaka.media.SegmentReference = function(position, startTime, endTime, uris, startByte, endByte) {};
-/**
- * Returns the segment's position within a particular Period.
- * @return {number} The segment's position.
- */
-shaka.media.SegmentReference.prototype.getPosition = function() {};
-/**
- * Returns the segment's start time in seconds, relative to
- * the start of a particular Period.
- * @return {number}
- */
-shaka.media.SegmentReference.prototype.getStartTime = function() {};
-/**
- * Returns the segment's end time in seconds, relative to
- * the start of a particular Period.
- * @return {number}
- */
-shaka.media.SegmentReference.prototype.getEndTime = function() {};
-/**
- * Creates the URIs of the resource containing the segment.
- * @return {!Array.<string>}
- */
-shaka.media.SegmentReference.prototype.createUris = function() {};
-/**
- * Returns the offset from the start of the resource to the
- * start of the segment.
- * @return {number}
- */
-shaka.media.SegmentReference.prototype.getStartByte = function() {};
-/**
- * Returns the offset from the start of the resource to the
- * end of the segment, inclusive. null indicates that the segment extends
- * to the end of the resource.
- * @return {?number}
- */
-shaka.media.SegmentReference.prototype.getEndByte = function() {};
-/**
- * Creates a DataViewReader, which abstracts a DataView object.
- * @param {!DataView} dataView The DataView.
- * @param {shaka.util.DataViewReader.Endianness} endianness The endianness.
- * @struct
- * @constructor
- */
-shaka.util.DataViewReader = function(dataView, endianness) {};
-/**
- * Endianness.
- * @enum {number}
- */
-shaka.util.DataViewReader.Endianness = {
-  BIG_ENDIAN: 0,
-  LITTLE_ENDIAN: 1
-};
-/**
- * @return {boolean} True if the reader has more data, false otherwise.
- */
-shaka.util.DataViewReader.prototype.hasMoreData = function() {};
-/**
- * Gets the current byte position.
- * @return {number}
- */
-shaka.util.DataViewReader.prototype.getPosition = function() {};
-/**
- * Gets the byte length of the DataView.
- * @return {number}
- */
-shaka.util.DataViewReader.prototype.getLength = function() {};
-/**
- * Reads an unsigned 8 bit integer, and advances the reader.
- * @return {number} The integer.
- * @throws {shaka.util.Error} when reading past the end of the data view.
- */
-shaka.util.DataViewReader.prototype.readUint8 = function() {};
-/**
- * Reads an unsigned 16 bit integer, and advances the reader.
- * @return {number} The integer.
- * @throws {shaka.util.Error} when reading past the end of the data view.
- */
-shaka.util.DataViewReader.prototype.readUint16 = function() {};
-/**
- * Reads an unsigned 32 bit integer, and advances the reader.
- * @return {number} The integer.
- * @throws {shaka.util.Error} when reading past the end of the data view.
- */
-shaka.util.DataViewReader.prototype.readUint32 = function() {};
-/**
- * Reads a signed 32 bit integer, and advances the reader.
- * @return {number} The integer.
- * @throws {shaka.util.Error} when reading past the end of the data view.
- */
-shaka.util.DataViewReader.prototype.readInt32 = function() {};
-/**
- * Reads an unsigned 64 bit integer, and advances the reader.
- * @return {number} The integer.
- * @throws {shaka.util.Error} when reading past the end of the data view or
- *   when reading an integer too large to store accurately in JavaScript.
- */
-shaka.util.DataViewReader.prototype.readUint64 = function() {};
-/**
- * Reads the specified number of raw bytes.
- * @param {number} bytes The number of bytes to read.
- * @return {!Uint8Array}
- * @throws {shaka.util.Error} when reading past the end of the data view.
- */
-shaka.util.DataViewReader.prototype.readBytes = function(bytes) {};
-/**
- * Skips the specified number of bytes.
- * @param {number} bytes The number of bytes to skip.
- * @throws {shaka.util.Error} when skipping past the end of the data view.
- */
-shaka.util.DataViewReader.prototype.skip = function(bytes) {};
-/**
- * Rewinds the specified number of bytes.
- * @param {number} bytes The number of bytes to rewind.
- * @throws {shaka.util.Error} when rewinding past the beginning of the data
- *   view.
- */
-shaka.util.DataViewReader.prototype.rewind = function(bytes) {};
-/**
- * Seeks to a specified position.
- * @param {number} position The desired byte position within the DataView.
- * @throws {shaka.util.Error} when seeking outside the range of the data view.
- */
-shaka.util.DataViewReader.prototype.seek = function(position) {};
-/**
- * Keeps reading until it reaches a byte that equals to zero.  The text is
- * assumed to be UTF-8.
- * @return {string}
- */
-shaka.util.DataViewReader.prototype.readTerminatedString = function() {};
-/**
- * Create a new MP4 Parser
- * @struct
- * @constructor
- */
-shaka.util.Mp4Parser = function() {};
-/**
- * @typedef {{
- *    parser: !shaka.util.Mp4Parser,
- *    partialOkay: boolean,
- *    start: number,
- *    size: number,
- *    version: ?number,
- *    flags: ?number,
- *    reader: !shaka.util.DataViewReader
- * }}
- * @property {!shaka.util.Mp4Parser} parser
- *   The parser that parsed this box. The parser can be used to parse child
- *   boxes where the configuration of the current parser is needed to parsed
- *   other boxes.
- * @property {boolean} partialOkay
- *   If true, allow partial payload for some boxes. If the goal is a child box,
- *   we can sometimes find it without enough data to find all child boxes.
- *   This property allows the opt_partialOkay flag from parse() to be propagated
- *   through methods like children().
- * @property {number} start
- *   The start of this box (before the header) in the original buffer. This
- *   start position is the absolute position.
- * @property {number} size
- *   The size of this box (including the header).
- * @property {?number} version
- *   The version for a full box, null for basic boxes.
- * @property {?number} flags
- *   The flags for a full box, null for basic boxes.
- * @property {!shaka.util.DataViewReader} reader
- *   The reader for this box is only for this box. Reading or not reading to
- *   the end will have no affect on the parser reading other sibling boxes.
- */
-shaka.util.Mp4Parser.ParsedBox;
-/**
- * @typedef {function(!shaka.util.Mp4Parser.ParsedBox)}
- */
-shaka.util.Mp4Parser.CallbackType;
-/**
- * Declare a box type as a Box.
- * @param {string} type
- * @param {!shaka.util.Mp4Parser.CallbackType} definition
- * @return {!shaka.util.Mp4Parser}
- */
-shaka.util.Mp4Parser.prototype.box = function(type, definition) {};
-/**
- * Declare a box type as a Full Box.
- * @param {string} type
- * @param {!shaka.util.Mp4Parser.CallbackType} definition
- * @return {!shaka.util.Mp4Parser}
- */
-shaka.util.Mp4Parser.prototype.fullBox = function(type, definition) {};
-/**
- * Stop parsing.  Useful for extracting information from partial segments and
- * avoiding an out-of-bounds error once you find what you are looking for.
- */
-shaka.util.Mp4Parser.prototype.stop = function() {};
-/**
- * Parse the given data using the added callbacks.
- * @param {!BufferSource} data
- * @param {boolean=} opt_partialOkay If true, allow partial payload for some
- *   boxes. If the goal is a child box, we can sometimes find it without enough
- *   data to find all child boxes.
- */
-shaka.util.Mp4Parser.prototype.parse = function(data, opt_partialOkay) {};
-/**
- * Parse the next box on the current level.
- * @param {number} absStart The absolute start position in the original
- *   byte array.
- * @param {!shaka.util.DataViewReader} reader
- * @param {boolean=} opt_partialOkay If true, allow partial payload for some
- *   boxes. If the goal is a child box, we can sometimes find it without enough
- *   data to find all child boxes.
- */
-shaka.util.Mp4Parser.prototype.parseNext = function(absStart, reader, opt_partialOkay) {};
-/**
- * A callback that tells the Mp4 parser to treat the body of a box as a series
- * of boxes. The number of boxes is limited by the size of the parent box.
- * @param {!shaka.util.Mp4Parser.ParsedBox} box
- */
-shaka.util.Mp4Parser.children = function(box) {};
-/**
- * A callback that tells the Mp4 parser to treat the body of a box as a sample
- * description. A sample description box has a fixed number of children. The
- * number of children is represented by a 4 byte unsigned integer. Each child
- * is a box.
- * @param {!shaka.util.Mp4Parser.ParsedBox} box
- */
-shaka.util.Mp4Parser.sampleDescription = function(box) {};
-/**
- * Create a callback that tells the Mp4 parser to treat the body of a box as a
- * binary blob and how to handle it.
- * @param {!function(!Uint8Array)} callback
- * @return {!shaka.util.Mp4Parser.CallbackType}
- */
-shaka.util.Mp4Parser.allData = function(callback) {};
-/**
- * Creates a SegmentIndex.
- * @param {!Array.<!shaka.media.SegmentReference>} references The list of
- *   SegmentReferences, which must be sorted first by their start times
- *   (ascending) and second by their end times (ascending), and have
- *   continuous, increasing positions.
- * @constructor
- * @struct
- * @implements {shaka.util.IDestroyable}
- */
-shaka.media.SegmentIndex = function(references) {};
-/**
- * @override
- */
-shaka.media.SegmentIndex.prototype.destroy = function() {};
-/**
- * Finds the position of the segment for the given time, in seconds, relative
- * to the start of a particular Period. Returns the position of the segment
- * with the largest end time if more than one segment is known for the given
- * time.
- * @param {number} time
- * @return {?number} The position of the segment, or null
- *   if the position of the segment could not be determined.
- */
-shaka.media.SegmentIndex.prototype.find = function(time) {};
-/**
- * Gets the SegmentReference for the segment at the given position.
- * @param {number} position The position of the segment.
- * @return {shaka.media.SegmentReference} The SegmentReference, or null if
- *   no such SegmentReference exists.
- */
-shaka.media.SegmentIndex.prototype.get = function(position) {};
-/**
- * Offset all segment references by a fixed amount.
- * @param {number} offset The amount to add to each segment's start and end
- *   times.
- */
-shaka.media.SegmentIndex.prototype.offset = function(offset) {};
-/**
- * Merges the given SegmentReferences.  Supports extending the original
- * references only.  Will not replace old references or interleave new ones.
- * @param {!Array.<!shaka.media.SegmentReference>} references The list of
- *   SegmentReferences, which must be sorted first by their start times
- *   (ascending) and second by their end times (ascending), and have
- *   continuous, increasing positions.
- */
-shaka.media.SegmentIndex.prototype.merge = function(references) {};
-/**
- * Removes all SegmentReferences that end before the given time.
- * @param {number} time The time in seconds.
- */
-shaka.media.SegmentIndex.prototype.evict = function(time) {};
 /**
  * Convert a Uint8Array to a base64 string.  The output will always use the
  * alternate encoding/alphabet also known as "base64url".
@@ -1005,169 +649,23 @@ shaka.text.CueRegion.scrollMode = {
   'UP': 'up'
 };
 /**
- * @namespace
- * @summary A networking plugin to handle http and https URIs via XHR.
- * @param {string} uri
- * @param {shakaExtern.Request} request
- * @param {function(ProgressEvent, shakaExtern.Request)} onProgress
- * @param {shaka.net.NetworkingEngine.RequestType} requestType
- * @return {!shakaExtern.IAbortableOperation.<shakaExtern.Response>}
+ * @param {string} mimeType
+ * @param {!shakaExtern.TextParserPlugin} plugin
  */
-shaka.net.HttpXHRPlugin = function(uri, request, onProgress, requestType) {};
+shaka.text.TextEngine.registerParser = function(mimeType, plugin) {};
 /**
- * Registers a manifest parser by file extension.
- * @param {string} extension The file extension of the manifest.
- * @param {shakaExtern.ManifestParser.Factory} parserFactory The factory
- *   used to create parser instances.
+ * @param {string} mimeType
  */
-shaka.media.ManifestParser.registerParserByExtension = function(extension, parserFactory) {};
+shaka.text.TextEngine.unregisterParser = function(mimeType) {};
 /**
- * Registers a manifest parser by MIME type.
- * @param {string} mimeType The MIME type of the manifest.
- * @param {shakaExtern.ManifestParser.Factory} parserFactory The factory
- *   used to create parser instances.
+ * @param {shakaExtern.TextDisplayer} displayer
  */
-shaka.media.ManifestParser.registerParserByMime = function(mimeType, parserFactory) {};
+shaka.text.TextEngine.prototype.setDisplayer = function(displayer) {};
 /**
- * Creates a PresentationTimeline.
- * @param {?number} presentationStartTime The wall-clock time, in seconds,
- *   when the presentation started or will start. Only required for live.
- * @param {number} presentationDelay The delay to give the presentation, in
- *   seconds.  Only required for live.
- * @see {shakaExtern.Manifest}
- * @see {@tutorial architecture}
- * @constructor
- * @struct
+ * Append cues to text displayer.
+ * @param {!Array<!shaka.text.Cue>} cues
  */
-shaka.media.PresentationTimeline = function(presentationStartTime, presentationDelay) {};
-/**
- * @return {number} The presentation's duration in seconds.
- *   Infinity indicates that the presentation continues indefinitely.
- */
-shaka.media.PresentationTimeline.prototype.getDuration = function() {};
-/**
- * Sets the presentation's duration.
- * @param {number} duration The presentation's duration in seconds.
- *   Infinity indicates that the presentation continues indefinitely.
- */
-shaka.media.PresentationTimeline.prototype.setDuration = function(duration) {};
-/**
- * @return {?number} The presentation's start time in seconds.
- */
-shaka.media.PresentationTimeline.prototype.getPresentationStartTime = function() {};
-/**
- * Sets the clock offset, which is the the difference between the client's clock
- * and the server's clock, in milliseconds (i.e., serverTime = Date.now() +
- * clockOffset).
- * @param {number} offset The clock offset, in ms.
- */
-shaka.media.PresentationTimeline.prototype.setClockOffset = function(offset) {};
-/**
- * Sets the presentation's static flag.
- * @param {boolean} isStatic If true, the presentation is static, meaning all
- *   segments are available at once.
- */
-shaka.media.PresentationTimeline.prototype.setStatic = function(isStatic) {};
-/**
- * Sets the presentation's segment availability duration. The segment
- * availability duration should only be set for live.
- * @param {number} segmentAvailabilityDuration The presentation's new segment
- *   availability duration in seconds.
- */
-shaka.media.PresentationTimeline.prototype.setSegmentAvailabilityDuration = function(segmentAvailabilityDuration) {};
-/**
- * Sets the presentation delay.
- * @param {number} delay
- */
-shaka.media.PresentationTimeline.prototype.setDelay = function(delay) {};
-/**
- * Gives PresentationTimeline a Stream's segments so it can size and position
- * the segment availability window, and account for missing segment
- * information. This function should be called once for each Stream (no more,
- * no less).
- * @param {!Array.<!shaka.media.SegmentReference>} references
- * @param {boolean} isFirstPeriod
- */
-shaka.media.PresentationTimeline.prototype.notifySegments = function(references, isFirstPeriod) {};
-/**
- * Gives PresentationTimeline a Stream's maximum segment duration so it can
- * size and position the segment availability window. This function should be
- * called once for each Stream (no more, no less), but does not have to be
- * called if notifySegments() is called instead for a particular stream.
- * @param {number} maxSegmentDuration The maximum segment duration for a
- *   particular stream.
- */
-shaka.media.PresentationTimeline.prototype.notifyMaxSegmentDuration = function(maxSegmentDuration) {};
-/**
- * @return {boolean} True if the presentation is live; otherwise, return
- *   false.
- */
-shaka.media.PresentationTimeline.prototype.isLive = function() {};
-/**
- * @return {boolean} True if the presentation is in progress (meaning not live,
- *   but also not completely available); otherwise, return false.
- */
-shaka.media.PresentationTimeline.prototype.isInProgress = function() {};
-/**
- * Gets the presentation's current segment availability start time. Segments
- * ending at or before this time should be assumed to be unavailable.
- * @return {number} The current segment availability start time, in seconds,
- *   relative to the start of the presentation.
- */
-shaka.media.PresentationTimeline.prototype.getSegmentAvailabilityStart = function() {};
-/**
- * Sets the presentation's current segment availability start time.
- * @param {number} time
- */
-shaka.media.PresentationTimeline.prototype.setAvailabilityStart = function(time) {};
-/**
- * Gets the presentation's current segment availability end time. Segments
- * starting after this time should be assumed to be unavailable.
- * @return {number} The current segment availability end time, in seconds,
- *   relative to the start of the presentation. Always returns the
- *   presentation's duration for video-on-demand.
- */
-shaka.media.PresentationTimeline.prototype.getSegmentAvailabilityEnd = function() {};
-/**
- * Gets the seek range start time, offset by the given amount.  This is used to
- * ensure that we don't "fall" back out of the seek window while we are
- * buffering.
- * @param {number} offset The offset to add to the start time.
- * @return {number} The current seek start time, in seconds, relative to the
- *   start of the presentation.
- */
-shaka.media.PresentationTimeline.prototype.getSafeSeekRangeStart = function(offset) {};
-/**
- * Gets the seek range start time.
- * @return {number}
- */
-shaka.media.PresentationTimeline.prototype.getSeekRangeStart = function() {};
-/**
- * Gets the seek range end.
- * @return {number}
- */
-shaka.media.PresentationTimeline.prototype.getSeekRangeEnd = function() {};
-/**
- * @namespace
- * @summary A plugin that handles requests for offline content.
- * @param {string} uri
- * @param {shakaExtern.Request} request
- * @param {function(ProgressEvent, shakaExtern.Request)} onProgress
- * @param {shaka.net.NetworkingEngine.RequestType=} requestType
- * @return {!shakaExtern.IAbortableOperation.<shakaExtern.Response>}
- */
-shaka.offline.OfflineScheme = function(uri, request, onProgress, requestType) {};
-/**
- * Install all polyfills.
- */
-shaka.polyfill.installAll = function() {};
-/**
- * Registers a new polyfill to be installed.
- * @param {function()} polyfill
- * @param {number=} priority An optional number priority.  Higher priorities
- *   will be executed before lower priority ones.  Default is 0.
- */
-shaka.polyfill.register = function(polyfill, priority) {};
+shaka.text.TextEngine.prototype.appendCues = function(cues) {};
 /**
  * <p>
  * This defines the default ABR manager for the Player.  An instance of this
@@ -1226,60 +724,305 @@ shaka.abr.SimpleAbrManager.prototype.setVariants = function(variants) {};
  */
 shaka.abr.SimpleAbrManager.prototype.configure = function(config) {};
 /**
- * Creates a new DASH parser.
+ * Registers a manifest parser by file extension.
+ * @param {string} extension The file extension of the manifest.
+ * @param {shakaExtern.ManifestParser.Factory} parserFactory The factory
+ *   used to create parser instances.
+ */
+shaka.media.ManifestParser.registerParserByExtension = function(extension, parserFactory) {};
+/**
+ * Registers a manifest parser by MIME type.
+ * @param {string} mimeType The MIME type of the manifest.
+ * @param {shakaExtern.ManifestParser.Factory} parserFactory The factory
+ *   used to create parser instances.
+ */
+shaka.media.ManifestParser.registerParserByMime = function(mimeType, parserFactory) {};
+/**
+ * Creates an InitSegmentReference, which provides the location to an
+ * initialization segment.
+ * @param {function():!Array.<string>} uris
+ *   A function that creates the URIs of the resource containing the segment.
+ * @param {number} startByte The offset from the start of the resource to the
+ *   start of the segment.
+ * @param {?number} endByte The offset from the start of the resource to the
+ *   end of the segment, inclusive. null indicates that the segment extends
+ *   to the end of the resource.
+ * @constructor
+ * @struct
+ */
+shaka.media.InitSegmentReference = function(uris, startByte, endByte) {};
+/**
+ * Creates the URIs of the resource containing the segment.
+ * @return {!Array.<string>}
+ */
+shaka.media.InitSegmentReference.prototype.createUris = function() {};
+/**
+ * Returns the offset from the start of the resource to the
+ * start of the segment.
+ * @return {number}
+ */
+shaka.media.InitSegmentReference.prototype.getStartByte = function() {};
+/**
+ * Returns the offset from the start of the resource to the
+ * end of the segment, inclusive. null indicates that the segment extends
+ * to the end of the resource.
+ * @return {?number}
+ */
+shaka.media.InitSegmentReference.prototype.getEndByte = function() {};
+/**
+ * Creates a SegmentReference, which provides the start time, end time, and
+ * location to a media segment.
+ * @param {number} position The segment's position within a particular Period.
+ *   The following should hold true between any two SegmentReferences from the
+ *   same Period, r1 and r2:
+ *   IF r2.position > r1.position THEN
+ *     [ (r2.startTime > r1.startTime) OR
+ *       (r2.startTime == r1.startTime AND r2.endTime >= r1.endTime) ]
+ * @param {number} startTime The segment's start time in seconds, relative to
+ *   the start of a particular Period.
+ * @param {number} endTime The segment's end time in seconds, relative to
+ *   the start of a particular Period. The segment ends the instant before
+ *   this time, so |endTime| must be strictly greater than |startTime|.
+ * @param {function():!Array.<string>} uris
+ *   A function that creates the URIs of the resource containing the segment.
+ * @param {number} startByte The offset from the start of the resource to the
+ *   start of the segment.
+ * @param {?number} endByte The offset from the start of the resource to the
+ *   end of the segment, inclusive. null indicates that the segment extends
+ *   to the end of the resource.
+ * @constructor
+ * @struct
+ */
+shaka.media.SegmentReference = function(position, startTime, endTime, uris, startByte, endByte) {};
+/**
+ * Returns the segment's position within a particular Period.
+ * @return {number} The segment's position.
+ */
+shaka.media.SegmentReference.prototype.getPosition = function() {};
+/**
+ * Returns the segment's start time in seconds, relative to
+ * the start of a particular Period.
+ * @return {number}
+ */
+shaka.media.SegmentReference.prototype.getStartTime = function() {};
+/**
+ * Returns the segment's end time in seconds, relative to
+ * the start of a particular Period.
+ * @return {number}
+ */
+shaka.media.SegmentReference.prototype.getEndTime = function() {};
+/**
+ * Creates the URIs of the resource containing the segment.
+ * @return {!Array.<string>}
+ */
+shaka.media.SegmentReference.prototype.createUris = function() {};
+/**
+ * Returns the offset from the start of the resource to the
+ * start of the segment.
+ * @return {number}
+ */
+shaka.media.SegmentReference.prototype.getStartByte = function() {};
+/**
+ * Returns the offset from the start of the resource to the
+ * end of the segment, inclusive. null indicates that the segment extends
+ * to the end of the resource.
+ * @return {?number}
+ */
+shaka.media.SegmentReference.prototype.getEndByte = function() {};
+/**
+ * Creates a DataViewReader, which abstracts a DataView object.
+ * @param {!DataView} dataView The DataView.
+ * @param {shaka.util.DataViewReader.Endianness} endianness The endianness.
  * @struct
  * @constructor
- * @implements {shakaExtern.ManifestParser}
  */
-shaka.dash.DashParser = function() {};
+shaka.util.DataViewReader = function(dataView, endianness) {};
 /**
- * @override
+ * Endianness.
+ * @enum {number}
  */
-shaka.dash.DashParser.prototype.configure = function(config) {};
+shaka.util.DataViewReader.Endianness = {
+  BIG_ENDIAN: 0,
+  LITTLE_ENDIAN: 1
+};
 /**
- * @override
+ * @return {boolean} True if the reader has more data, false otherwise.
  */
-shaka.dash.DashParser.prototype.start = function(uri, playerInterface) {};
+shaka.util.DataViewReader.prototype.hasMoreData = function() {};
 /**
- * @override
+ * Gets the current byte position.
+ * @return {number}
  */
-shaka.dash.DashParser.prototype.stop = function() {};
+shaka.util.DataViewReader.prototype.getPosition = function() {};
 /**
- * @override
+ * Gets the byte length of the DataView.
+ * @return {number}
  */
-shaka.dash.DashParser.prototype.update = function() {};
+shaka.util.DataViewReader.prototype.getLength = function() {};
 /**
- * @override
+ * Reads an unsigned 8 bit integer, and advances the reader.
+ * @return {number} The integer.
+ * @throws {shaka.util.Error} when reading past the end of the data view.
  */
-shaka.dash.DashParser.prototype.onExpirationUpdated = function(sessionId, expiration) {};
+shaka.util.DataViewReader.prototype.readUint8 = function() {};
 /**
- * @namespace
- * @summary A networking plugin to handle http and https URIs via the Fetch API.
- * @param {string} uri
- * @param {shakaExtern.Request} request
- * @param {function(ProgressEvent, shakaExtern.Request)} onProgress
- * @param {shaka.net.NetworkingEngine.RequestType} requestType
- * @return {!shakaExtern.IAbortableOperation.<shakaExtern.Response>}
+ * Reads an unsigned 16 bit integer, and advances the reader.
+ * @return {number} The integer.
+ * @throws {shaka.util.Error} when reading past the end of the data view.
  */
-shaka.net.HttpFetchPlugin = function(uri, request, onProgress, requestType) {};
+shaka.util.DataViewReader.prototype.readUint16 = function() {};
 /**
- * Determine if Fetch API is supported in the browser. Note: this is
- * deliberately exposed as a method to allow the client app to use the same
- * logic as Shaka when determining support.
- * @return {boolean}
+ * Reads an unsigned 32 bit integer, and advances the reader.
+ * @return {number} The integer.
+ * @throws {shaka.util.Error} when reading past the end of the data view.
  */
-shaka.net.HttpFetchPlugin.isSupported = function() {};
+shaka.util.DataViewReader.prototype.readUint32 = function() {};
 /**
- * @namespace
- * @summary A networking plugin to handle data URIs.
- * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/data_URIs
- * @param {string} uri
- * @param {shakaExtern.Request} request
- * @param {function(ProgressEvent, shakaExtern.Request)} onProgress
- * @param {shaka.net.NetworkingEngine.RequestType=} requestType
- * @return {!shakaExtern.IAbortableOperation.<shakaExtern.Response>}
+ * Reads a signed 32 bit integer, and advances the reader.
+ * @return {number} The integer.
+ * @throws {shaka.util.Error} when reading past the end of the data view.
  */
-shaka.net.DataUriPlugin = function(uri, request, onProgress, requestType) {};
+shaka.util.DataViewReader.prototype.readInt32 = function() {};
+/**
+ * Reads an unsigned 64 bit integer, and advances the reader.
+ * @return {number} The integer.
+ * @throws {shaka.util.Error} when reading past the end of the data view or
+ *   when reading an integer too large to store accurately in JavaScript.
+ */
+shaka.util.DataViewReader.prototype.readUint64 = function() {};
+/**
+ * Reads the specified number of raw bytes.
+ * @param {number} bytes The number of bytes to read.
+ * @return {!Uint8Array}
+ * @throws {shaka.util.Error} when reading past the end of the data view.
+ */
+shaka.util.DataViewReader.prototype.readBytes = function(bytes) {};
+/**
+ * Skips the specified number of bytes.
+ * @param {number} bytes The number of bytes to skip.
+ * @throws {shaka.util.Error} when skipping past the end of the data view.
+ */
+shaka.util.DataViewReader.prototype.skip = function(bytes) {};
+/**
+ * Rewinds the specified number of bytes.
+ * @param {number} bytes The number of bytes to rewind.
+ * @throws {shaka.util.Error} when rewinding past the beginning of the data
+ *   view.
+ */
+shaka.util.DataViewReader.prototype.rewind = function(bytes) {};
+/**
+ * Seeks to a specified position.
+ * @param {number} position The desired byte position within the DataView.
+ * @throws {shaka.util.Error} when seeking outside the range of the data view.
+ */
+shaka.util.DataViewReader.prototype.seek = function(position) {};
+/**
+ * Keeps reading until it reaches a byte that equals to zero.  The text is
+ * assumed to be UTF-8.
+ * @return {string}
+ */
+shaka.util.DataViewReader.prototype.readTerminatedString = function() {};
+/**
+ * Create a new MP4 Parser
+ * @struct
+ * @constructor
+ */
+shaka.util.Mp4Parser = function() {};
+/**
+ * @typedef {{
+ *    parser: !shaka.util.Mp4Parser,
+ *    partialOkay: boolean,
+ *    start: number,
+ *    size: number,
+ *    version: ?number,
+ *    flags: ?number,
+ *    reader: !shaka.util.DataViewReader
+ * }}
+ * @property {!shaka.util.Mp4Parser} parser
+ *   The parser that parsed this box. The parser can be used to parse child
+ *   boxes where the configuration of the current parser is needed to parsed
+ *   other boxes.
+ * @property {boolean} partialOkay
+ *   If true, allow partial payload for some boxes. If the goal is a child box,
+ *   we can sometimes find it without enough data to find all child boxes.
+ *   This property allows the opt_partialOkay flag from parse() to be propagated
+ *   through methods like children().
+ * @property {number} start
+ *   The start of this box (before the header) in the original buffer. This
+ *   start position is the absolute position.
+ * @property {number} size
+ *   The size of this box (including the header).
+ * @property {?number} version
+ *   The version for a full box, null for basic boxes.
+ * @property {?number} flags
+ *   The flags for a full box, null for basic boxes.
+ * @property {!shaka.util.DataViewReader} reader
+ *   The reader for this box is only for this box. Reading or not reading to
+ *   the end will have no affect on the parser reading other sibling boxes.
+ */
+shaka.util.Mp4Parser.ParsedBox;
+/**
+ * @typedef {function(!shaka.util.Mp4Parser.ParsedBox)}
+ */
+shaka.util.Mp4Parser.CallbackType;
+/**
+ * Declare a box type as a Box.
+ * @param {string} type
+ * @param {!shaka.util.Mp4Parser.CallbackType} definition
+ * @return {!shaka.util.Mp4Parser}
+ */
+shaka.util.Mp4Parser.prototype.box = function(type, definition) {};
+/**
+ * Declare a box type as a Full Box.
+ * @param {string} type
+ * @param {!shaka.util.Mp4Parser.CallbackType} definition
+ * @return {!shaka.util.Mp4Parser}
+ */
+shaka.util.Mp4Parser.prototype.fullBox = function(type, definition) {};
+/**
+ * Stop parsing.  Useful for extracting information from partial segments and
+ * avoiding an out-of-bounds error once you find what you are looking for.
+ */
+shaka.util.Mp4Parser.prototype.stop = function() {};
+/**
+ * Parse the given data using the added callbacks.
+ * @param {!BufferSource} data
+ * @param {boolean=} opt_partialOkay If true, allow partial payload for some
+ *   boxes. If the goal is a child box, we can sometimes find it without enough
+ *   data to find all child boxes.
+ */
+shaka.util.Mp4Parser.prototype.parse = function(data, opt_partialOkay) {};
+/**
+ * Parse the next box on the current level.
+ * @param {number} absStart The absolute start position in the original
+ *   byte array.
+ * @param {!shaka.util.DataViewReader} reader
+ * @param {boolean=} opt_partialOkay If true, allow partial payload for some
+ *   boxes. If the goal is a child box, we can sometimes find it without enough
+ *   data to find all child boxes.
+ */
+shaka.util.Mp4Parser.prototype.parseNext = function(absStart, reader, opt_partialOkay) {};
+/**
+ * A callback that tells the Mp4 parser to treat the body of a box as a series
+ * of boxes. The number of boxes is limited by the size of the parent box.
+ * @param {!shaka.util.Mp4Parser.ParsedBox} box
+ */
+shaka.util.Mp4Parser.children = function(box) {};
+/**
+ * A callback that tells the Mp4 parser to treat the body of a box as a sample
+ * description. A sample description box has a fixed number of children. The
+ * number of children is represented by a 4 byte unsigned integer. Each child
+ * is a box.
+ * @param {!shaka.util.Mp4Parser.ParsedBox} box
+ */
+shaka.util.Mp4Parser.sampleDescription = function(box) {};
+/**
+ * Create a callback that tells the Mp4 parser to treat the body of a box as a
+ * binary blob and how to handle it.
+ * @param {!function(!Uint8Array)} callback
+ * @return {!shaka.util.Mp4Parser.CallbackType}
+ */
+shaka.util.Mp4Parser.allData = function(callback) {};
 /**
  * <p>
  * This defines the default text displayer plugin. An instance of this
@@ -1624,6 +1367,177 @@ shaka.Player.prototype.retryStreaming = function() {};
  */
 shaka.Player.prototype.getManifest = function() {};
 /**
+ * Creates a PresentationTimeline.
+ * @param {?number} presentationStartTime The wall-clock time, in seconds,
+ *   when the presentation started or will start. Only required for live.
+ * @param {number} presentationDelay The delay to give the presentation, in
+ *   seconds.  Only required for live.
+ * @see {shakaExtern.Manifest}
+ * @see {@tutorial architecture}
+ * @constructor
+ * @struct
+ */
+shaka.media.PresentationTimeline = function(presentationStartTime, presentationDelay) {};
+/**
+ * @return {number} The presentation's duration in seconds.
+ *   Infinity indicates that the presentation continues indefinitely.
+ */
+shaka.media.PresentationTimeline.prototype.getDuration = function() {};
+/**
+ * Sets the presentation's duration.
+ * @param {number} duration The presentation's duration in seconds.
+ *   Infinity indicates that the presentation continues indefinitely.
+ */
+shaka.media.PresentationTimeline.prototype.setDuration = function(duration) {};
+/**
+ * @return {?number} The presentation's start time in seconds.
+ */
+shaka.media.PresentationTimeline.prototype.getPresentationStartTime = function() {};
+/**
+ * Sets the clock offset, which is the the difference between the client's clock
+ * and the server's clock, in milliseconds (i.e., serverTime = Date.now() +
+ * clockOffset).
+ * @param {number} offset The clock offset, in ms.
+ */
+shaka.media.PresentationTimeline.prototype.setClockOffset = function(offset) {};
+/**
+ * Sets the presentation's static flag.
+ * @param {boolean} isStatic If true, the presentation is static, meaning all
+ *   segments are available at once.
+ */
+shaka.media.PresentationTimeline.prototype.setStatic = function(isStatic) {};
+/**
+ * Sets the presentation's segment availability duration. The segment
+ * availability duration should only be set for live.
+ * @param {number} segmentAvailabilityDuration The presentation's new segment
+ *   availability duration in seconds.
+ */
+shaka.media.PresentationTimeline.prototype.setSegmentAvailabilityDuration = function(segmentAvailabilityDuration) {};
+/**
+ * Sets the presentation delay.
+ * @param {number} delay
+ */
+shaka.media.PresentationTimeline.prototype.setDelay = function(delay) {};
+/**
+ * Gives PresentationTimeline a Stream's segments so it can size and position
+ * the segment availability window, and account for missing segment
+ * information. This function should be called once for each Stream (no more,
+ * no less).
+ * @param {!Array.<!shaka.media.SegmentReference>} references
+ * @param {boolean} isFirstPeriod
+ */
+shaka.media.PresentationTimeline.prototype.notifySegments = function(references, isFirstPeriod) {};
+/**
+ * Gives PresentationTimeline a Stream's maximum segment duration so it can
+ * size and position the segment availability window. This function should be
+ * called once for each Stream (no more, no less), but does not have to be
+ * called if notifySegments() is called instead for a particular stream.
+ * @param {number} maxSegmentDuration The maximum segment duration for a
+ *   particular stream.
+ */
+shaka.media.PresentationTimeline.prototype.notifyMaxSegmentDuration = function(maxSegmentDuration) {};
+/**
+ * @return {boolean} True if the presentation is live; otherwise, return
+ *   false.
+ */
+shaka.media.PresentationTimeline.prototype.isLive = function() {};
+/**
+ * @return {boolean} True if the presentation is in progress (meaning not live,
+ *   but also not completely available); otherwise, return false.
+ */
+shaka.media.PresentationTimeline.prototype.isInProgress = function() {};
+/**
+ * Gets the presentation's current segment availability start time. Segments
+ * ending at or before this time should be assumed to be unavailable.
+ * @return {number} The current segment availability start time, in seconds,
+ *   relative to the start of the presentation.
+ */
+shaka.media.PresentationTimeline.prototype.getSegmentAvailabilityStart = function() {};
+/**
+ * Sets the presentation's current segment availability start time.
+ * @param {number} time
+ */
+shaka.media.PresentationTimeline.prototype.setAvailabilityStart = function(time) {};
+/**
+ * Gets the presentation's current segment availability end time. Segments
+ * starting after this time should be assumed to be unavailable.
+ * @return {number} The current segment availability end time, in seconds,
+ *   relative to the start of the presentation. Always returns the
+ *   presentation's duration for video-on-demand.
+ */
+shaka.media.PresentationTimeline.prototype.getSegmentAvailabilityEnd = function() {};
+/**
+ * Gets the seek range start time, offset by the given amount.  This is used to
+ * ensure that we don't "fall" back out of the seek window while we are
+ * buffering.
+ * @param {number} offset The offset to add to the start time.
+ * @return {number} The current seek start time, in seconds, relative to the
+ *   start of the presentation.
+ */
+shaka.media.PresentationTimeline.prototype.getSafeSeekRangeStart = function(offset) {};
+/**
+ * Gets the seek range start time.
+ * @return {number}
+ */
+shaka.media.PresentationTimeline.prototype.getSeekRangeStart = function() {};
+/**
+ * Gets the seek range end.
+ * @return {number}
+ */
+shaka.media.PresentationTimeline.prototype.getSeekRangeEnd = function() {};
+/**
+ * Creates a SegmentIndex.
+ * @param {!Array.<!shaka.media.SegmentReference>} references The list of
+ *   SegmentReferences, which must be sorted first by their start times
+ *   (ascending) and second by their end times (ascending), and have
+ *   continuous, increasing positions.
+ * @constructor
+ * @struct
+ * @implements {shaka.util.IDestroyable}
+ */
+shaka.media.SegmentIndex = function(references) {};
+/**
+ * @override
+ */
+shaka.media.SegmentIndex.prototype.destroy = function() {};
+/**
+ * Finds the position of the segment for the given time, in seconds, relative
+ * to the start of a particular Period. Returns the position of the segment
+ * with the largest end time if more than one segment is known for the given
+ * time.
+ * @param {number} time
+ * @return {?number} The position of the segment, or null
+ *   if the position of the segment could not be determined.
+ */
+shaka.media.SegmentIndex.prototype.find = function(time) {};
+/**
+ * Gets the SegmentReference for the segment at the given position.
+ * @param {number} position The position of the segment.
+ * @return {shaka.media.SegmentReference} The SegmentReference, or null if
+ *   no such SegmentReference exists.
+ */
+shaka.media.SegmentIndex.prototype.get = function(position) {};
+/**
+ * Offset all segment references by a fixed amount.
+ * @param {number} offset The amount to add to each segment's start and end
+ *   times.
+ */
+shaka.media.SegmentIndex.prototype.offset = function(offset) {};
+/**
+ * Merges the given SegmentReferences.  Supports extending the original
+ * references only.  Will not replace old references or interleave new ones.
+ * @param {!Array.<!shaka.media.SegmentReference>} references The list of
+ *   SegmentReferences, which must be sorted first by their start times
+ *   (ascending) and second by their end times (ascending), and have
+ *   continuous, increasing positions.
+ */
+shaka.media.SegmentIndex.prototype.merge = function(references) {};
+/**
+ * Removes all SegmentReferences that end before the given time.
+ * @param {number} time The time in seconds.
+ */
+shaka.media.SegmentIndex.prototype.evict = function(time) {};
+/**
  * This manages persistent offline data including storage, listing, and deleting
  * stored manifests.  Playback of offline manifests are done using Player
  * using the special URI (see shaka.offline.OfflineUri).
@@ -1699,3 +1613,89 @@ shaka.offline.Storage.prototype.list = function() {};
  * @return {!Promise}
  */
 shaka.offline.Storage.deleteAll = function() {};
+/**
+ * @namespace
+ * @summary A networking plugin to handle data URIs.
+ * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/data_URIs
+ * @param {string} uri
+ * @param {shakaExtern.Request} request
+ * @param {function(ProgressEvent, shakaExtern.Request)} onProgress
+ * @param {shaka.net.NetworkingEngine.RequestType=} requestType
+ * @return {!shakaExtern.IAbortableOperation.<shakaExtern.Response>}
+ */
+shaka.net.DataUriPlugin = function(uri, request, onProgress, requestType) {};
+/**
+ * @namespace
+ * @summary A networking plugin to handle http and https URIs via XHR.
+ * @param {string} uri
+ * @param {shakaExtern.Request} request
+ * @param {function(ProgressEvent, shakaExtern.Request)} onProgress
+ * @param {shaka.net.NetworkingEngine.RequestType} requestType
+ * @return {!shakaExtern.IAbortableOperation.<shakaExtern.Response>}
+ */
+shaka.net.HttpXHRPlugin = function(uri, request, onProgress, requestType) {};
+/**
+ * Install all polyfills.
+ */
+shaka.polyfill.installAll = function() {};
+/**
+ * Registers a new polyfill to be installed.
+ * @param {function()} polyfill
+ * @param {number=} priority An optional number priority.  Higher priorities
+ *   will be executed before lower priority ones.  Default is 0.
+ */
+shaka.polyfill.register = function(polyfill, priority) {};
+/**
+ * @namespace
+ * @summary A networking plugin to handle http and https URIs via the Fetch API.
+ * @param {string} uri
+ * @param {shakaExtern.Request} request
+ * @param {function(ProgressEvent, shakaExtern.Request)} onProgress
+ * @param {shaka.net.NetworkingEngine.RequestType} requestType
+ * @return {!shakaExtern.IAbortableOperation.<shakaExtern.Response>}
+ */
+shaka.net.HttpFetchPlugin = function(uri, request, onProgress, requestType) {};
+/**
+ * Determine if Fetch API is supported in the browser. Note: this is
+ * deliberately exposed as a method to allow the client app to use the same
+ * logic as Shaka when determining support.
+ * @return {boolean}
+ */
+shaka.net.HttpFetchPlugin.isSupported = function() {};
+/**
+ * Creates a new DASH parser.
+ * @struct
+ * @constructor
+ * @implements {shakaExtern.ManifestParser}
+ */
+shaka.dash.DashParser = function() {};
+/**
+ * @override
+ */
+shaka.dash.DashParser.prototype.configure = function(config) {};
+/**
+ * @override
+ */
+shaka.dash.DashParser.prototype.start = function(uri, playerInterface) {};
+/**
+ * @override
+ */
+shaka.dash.DashParser.prototype.stop = function() {};
+/**
+ * @override
+ */
+shaka.dash.DashParser.prototype.update = function() {};
+/**
+ * @override
+ */
+shaka.dash.DashParser.prototype.onExpirationUpdated = function(sessionId, expiration) {};
+/**
+ * @namespace
+ * @summary A plugin that handles requests for offline content.
+ * @param {string} uri
+ * @param {shakaExtern.Request} request
+ * @param {function(ProgressEvent, shakaExtern.Request)} onProgress
+ * @param {shaka.net.NetworkingEngine.RequestType=} requestType
+ * @return {!shakaExtern.IAbortableOperation.<shakaExtern.Response>}
+ */
+shaka.offline.OfflineScheme = function(uri, request, onProgress, requestType) {};
